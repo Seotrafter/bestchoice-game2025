@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TowerGuard Champions | Epic Tower Defense Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link rel='icon' href='/src/icons/logo.png' type='image/x-icon'>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#b10207',
+                        secondary: '#31465a',
+                        tertiary: '#5f010a',
+                        dark: '#2d180f',
+                        light: '#ffffff'
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': {
+                                transform: 'translateY(0)'
+                            },
+                            '50%': {
+                                transform: 'translateY(-10px)'
+                            },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes backgroundPulse {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .bg-animate {
+            background-size: 200% 200%;
+            animation: backgroundPulse 15s ease infinite;
+        }
+
+        .tower-shadow {
+            filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .text-shadow {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .clip-diagonal {
+            clip-path: polygon(0 0, 100% 0, 100% 92%, 0 100%);
+        }
+
+        .clip-diagonal-reverse {
+            clip-path: polygon(0 8%, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .bg-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23b10207' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+
+<body class="bg-light bg-pattern font-sans">
+    <!-- Header Navigation -->
+    <header class="fixed w-full top-0 z-50 bg-white bg-opacity-95 shadow-md">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Logo and Site Name -->
+                <a href="/" class="flex items-center space-x-2">
+                    <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg">
+                        <i class="fas fa-chess-rook text-2xl text-white"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-secondary">TowerGuard<span class="text-primary">Champions</span></span>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex space-x-1">
+                    <a href="#features" class="px-4 py-2 rounded-full text-secondary hover:bg-primary hover:text-white transition-all duration-300 font-semibold">Features</a>
+                    <a href="#gameplay" class="px-4 py-2 rounded-full text-secondary hover:bg-primary hover:text-white transition-all duration-300 font-semibold">Gameplay</a>
+                    <a href="#worlds" class="px-4 py-2 rounded-full text-secondary hover:bg-primary hover:text-white transition-all duration-300 font-semibold">Worlds</a>
+                    <a href="#towers" class="px-4 py-2 rounded-full text-secondary hover:bg-primary hover:text-white transition-all duration-300 font-semibold">Towers</a>
+                    <a href="#download" class="px-6 py-2 bg-primary text-white rounded-full hover:bg-tertiary transition-all duration-300 shadow-lg font-bold">
+                        <i class="fas fa-download mr-2"></i>Download
+                    </a>
+                </nav>
+
+                <!-- Mobile Navigation Toggle -->
+                <button id="menu-toggle" class="md:hidden text-secondary text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Navigation Menu -->
+            <div id="mobile-menu" class="md:hidden hidden mt-4 pb-4">
+                <nav class="flex flex-col space-y-2">
+                    <a href="#features" class="px-4 py-3 rounded-lg text-secondary hover:bg-primary hover:text-white transition-all duration-300 font-semibold">Features</a>
+                    <a href="#gameplay" class="px-4 py-3 rounded-lg text-secondary hover:bg-primary hover:text-white transition-all duration-300 font-semibold">Gameplay</a>
+                    <a href="#worlds" class="px-4 py-3 rounded-lg text-secondary hover:bg-primary hover:text-white transition-all duration-300 font-semibold">Worlds</a>
+                    <a href="#towers" class="px-4 py-3 rounded-lg text-secondary hover:bg-primary hover:text-white transition-all duration-300 font-semibold">Towers</a>
+                    <a href="#download" class="px-4 py-3 bg-primary text-white rounded-lg hover:bg-tertiary transition-all duration-300 text-center font-bold">
+                        <i class="fas fa-download mr-2"></i>Download Now
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 bg-gradient-to-b from-secondary to-primary clip-diagonal relative overflow-hidden">
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\" 60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')]"></div>
+        </div>
+
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="w-full md:w-1/2 text-center md:text-left mb-10 md:mb-0">
+                    <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 text-shadow">
+                        Defend Your Kingdom<br>
+                        <span class="text-4xl md:text-5xl">Master Strategic Defense</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl text-white mb-8 max-w-lg opacity-90">
+                        Build towers, command forces, and repel invaders in this epic tower defense adventure!
+                    </p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center md:justify-start">
+                        <a href="#download" class="px-8 py-4 bg-white text-primary rounded-full text-xl font-bold hover:bg-opacity-90 transition-all duration-300 shadow-lg flex items-center justify-center">
+                            <i class="fab fa-google-play mr-3 text-2xl"></i>
+                            Download Now
+                        </a>
+                        <a href="#features" class="px-8 py-4 bg-transparent border-2 border-white text-white rounded-full text-xl font-bold hover:bg-white hover:text-primary transition-all duration-300 flex items-center justify-center">
+                            <i class="fas fa-info-circle mr-3"></i>
+                            Learn More
+                        </a>
+                    </div>
+                    <div class="mt-8 flex items-center justify-center md:justify-start">
+                        <div class="flex">
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star-half-alt text-yellow-400"></i>
+                        </div>
+                        <div class="ml-2 text-white">
+                            <span class="font-bold">4.4</span> | <span>1,670 Reviews</span>
+                        </div>
+                        <div class="ml-6 text-white flex items-center">
+                            <i class="fas fa-download mr-2"></i>
+                            <span class="font-bold">100K+</span> Downloads
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 relative">
+                    <div class="relative w-full max-w-md mx-auto">
+                        <div class="absolute inset-0 bg-dark rounded-3xl transform rotate-3 scale-105 opacity-20"></div>
+                        <div class="absolute inset-0 bg-tertiary rounded-3xl transform -rotate-3 scale-105 opacity-30"></div>
+                        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden relative border-4 border-white">
+                            <img src="/src/img/main.png" alt="Tower Defense Game Screenshot" class="w-full h-auto" />
+                            <div class="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-t from-primary/30 to-transparent"></div>
+                        </div>
+                        <div class="absolute -bottom-6 -right-6 animate-float tower-shadow">
+                            <div class="w-24 h-24 bg-primary rounded-full flex items-center justify-center shadow-xl">
+                                <i class="fas fa-chess-rook text-3xl text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-secondary mb-4">Game Features</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Explore the amazing features that make TowerGuard Champions an unforgettable tower defense experience</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                    <div class="h-40 bg-primary bg-animate bg-gradient-to-r from-primary to-tertiary flex items-center justify-center">
+                        <i class="fas fa-chess-rook text-6xl text-white opacity-90"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-secondary mb-3">Diverse Towers</h3>
+                        <p class="text-gray-600">Build and upgrade different towers including Archers, Magic, Barracks, and Cannons to defend your kingdom.</p>
+                        <ul class="mt-4 space-y-2">
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>4 unique tower types</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>Multiple upgrade paths</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>Strategic placement options</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                    <div class="h-40 bg-secondary bg-animate bg-gradient-to-r from-secondary to-dark flex items-center justify-center">
+                        <i class="fas fa-bolt text-6xl text-white opacity-90"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-secondary mb-3">Special Abilities</h3>
+                        <p class="text-gray-600">Unleash powerful special abilities like Meteor, Star Strike, Ice Bomb, Air Strike, and Bomb for extra firepower.</p>
+                        <ul class="mt-4 space-y-2">
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>5 devastating abilities</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>Area damage effects</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>Tactical deployment timing</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                    <div class="h-40 bg-tertiary bg-animate bg-gradient-to-r from-tertiary to-primary flex items-center justify-center">
+                        <i class="fas fa-wifi text-6xl text-white opacity-90"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-secondary mb-3">Offline Gameplay</h3>
+                        <p class="text-gray-600">Play anytime, anywhere without an internet connection! Just grab your device and start your defense strategy.</p>
+                        <ul class="mt-4 space-y-2">
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>No internet required</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>Perfect for travel</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>Save mobile data</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                    <div class="h-40 bg-dark bg-animate bg-gradient-to-r from-dark to-secondary flex items-center justify-center">
+                        <i class="fas fa-skull text-6xl text-white opacity-90"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-secondary mb-3">Epic Enemies</h3>
+                        <p class="text-gray-600">Battle many unique enemies like golems, minotaurs, and vikings across beautiful maps with colorful graphics.</p>
+                        <ul class="mt-4 space-y-2">
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>Diverse enemy types</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>Unique attack patterns</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>Challenging boss battles</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                    <div class="h-40 bg-primary bg-animate bg-gradient-to-r from-primary to-tertiary flex items-center justify-center">
+                        <i class="fas fa-mountain text-6xl text-white opacity-90"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-secondary mb-3">Diverse Worlds</h3>
+                        <p class="text-gray-600">Explore different maps with various themes: high meadows, deep swamps, dry deserts, icy mountains, and old volcanoes.</p>
+                        <ul class="mt-4 space-y-2">
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>5 unique environments</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>Distinctive visual themes</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>Strategic terrain advantages</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                    <div class="h-40 bg-secondary bg-animate bg-gradient-to-r from-secondary to-dark flex items-center justify-center">
+                        <i class="fas fa-trophy text-6xl text-white opacity-90"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-secondary mb-3">Difficulty Modes</h3>
+                        <p class="text-gray-600">Challenge yourself with unique difficulty modes for each map: easy, medium, or hard. Higher difficulty gives more diamonds!</p>
+                        <ul class="mt-4 space-y-2">
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>Adjustable challenge levels</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>Greater rewards for harder modes</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-arrow-alt-circle-right text-primary mr-2"></i>
+                                <span>Perfect for all skill levels</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gameplay Section -->
+    <section id="gameplay" class="py-20 bg-gradient-to-b from-white to-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-secondary mb-4">Epic Gameplay</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Immerse yourself in strategic tower defense action with beautiful graphics and engaging mechanics</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="w-full md:w-1/2 md:pr-8 mb-10 md:mb-0">
+                    <h3 class="text-3xl font-bold text-secondary mb-6">Strategic Tower Placement</h3>
+                    <p class="text-xl text-gray-600 mb-6">Position your defenses strategically to create the perfect maze of destruction for incoming enemies. Each tower has unique advantages:</p>
+
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-primary p-3 rounded-full mr-4">
+                                <i class="fas fa-bullseye text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold text-secondary mb-2">Tactical Positioning</h4>
+                                <p class="text-gray-600">Place towers at choke points to maximize damage and slow down enemy advances.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-secondary p-3 rounded-full mr-4">
+                                <i class="fas fa-sync text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold text-secondary mb-2">Tower Synergies</h4>
+                                <p class="text-gray-600">Combine different tower types to create powerful synergies that obliterate enemy waves.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-tertiary p-3 rounded-full mr-4">
+                                <i class="fas fa-level-up-alt text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold text-secondary mb-2">Strategic Upgrades</h4>
+                                <p class="text-gray-600">Decide which towers to upgrade first to deal with specific enemy types and wave compositions.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-1/2 relative">
+                    <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-8 border-white transform rotate-1">
+                        <img src="/src/img/gameplay.png" alt="Gameplay Screenshot" class="w-full h-auto" />
+                    </div>
+                    <div class="absolute -top-5 -right-5 animate-float">
+                        <div class="bg-primary rounded-full h-20 w-20 flex items-center justify-center shadow-lg">
+                            <i class="fas fa-gamepad text-2xl text-white"></i>
+                        </div>
+                    </div>
+                    <div class="absolute -bottom-5 -left-5 animate-pulse-slow">
+                        <div class="bg-secondary rounded-full h-16 w-16 flex items-center justify-center shadow-lg">
+                            <i class="fas fa-bolt text-xl text-white"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-20 bg-secondary bg-opacity-10 rounded-3xl p-8 md:p-12">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="text-center p-6 bg-white rounded-xl shadow-md transform transition-all duration-300 hover:-translate-y-2 hover:shadow-lg">
+                        <div class="inline-block bg-primary p-4 rounded-full mb-4">
+                            <i class="fas fa-magic text-2xl text-white"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-secondary mb-2">Special Abilities</h4>
+                        <p class="text-gray-600">Unleash powerful special abilities at critical moments to turn the tide of battle.</p>
+                    </div>
+
+                    <div class="text-center p-6 bg-white rounded-xl shadow-md transform transition-all duration-300 hover:-translate-y-2 hover:shadow-lg">
+                        <div class="inline-block bg-tertiary p-4 rounded-full mb-4">
+                            <i class="fas fa-coins text-2xl text-white"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-secondary mb-2">Resource Management</h4>
+                        <p class="text-gray-600">Balance your gold and resources to build, upgrade and maintain your defense network.</p>
+                    </div>
+
+                    <div class="text-center p-6 bg-white rounded-xl shadow-md transform transition-all duration-300 hover:-translate-y-2 hover:shadow-lg">
+                        <div class="inline-block bg-dark p-4 rounded-full mb-4">
+                            <i class="fas fa-brain text-2xl text-white"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-secondary mb-2">Strategic Depth</h4>
+                        <p class="text-gray-600">Adapt your strategy to counter diverse enemy types with different strengths and weaknesses.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Worlds Section -->
+    <section id="worlds" class="py-20 bg-gradient-to-b from-secondary to-tertiary clip-diagonal-reverse text-white relative">
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\" 60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-20"></div>
+
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-shadow">Explore Magical Worlds</h2>
+                <p class="text-xl max-w-2xl mx-auto text-white text-opacity-90">Journey through diverse landscapes, each with unique challenges and strategic opportunities</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- World 1 -->
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg border border-white border-opacity-20 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                    <div class="h-32  bg-cover bg-center relative">
+                        <div class="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-shadow">
+                            <h3 class="text-2xl font-bold text-white">Cloudy Valleys</h3>
+                            <p class="text-white text-opacity-90">High meadows with lush grass</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-white text-opacity-90 mb-4">Navigate the strategic highlands where enemies march through winding paths surrounded by beautiful meadows.</p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex space-x-2">
+                                <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-sm">Easy</span>
+                                <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-sm">Medium</span>
+                                <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-sm">Hard</span>
+                            </div>
+                            <span class="text-white"><i class="fas fa-diamond text-yellow-300 mr-1"></i> Rewards</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- World 2 -->
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg border border-white border-opacity-20 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                    <div class="h-32 bg-cover bg-center relative">
+                        <div class="absolute inset-0 bg-gradient-to-t from-secondary/70 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-shadow">
+                            <h3 class="text-2xl font-bold text-white">Hidden Swamps</h3>
+                            <p class="text-white text-opacity-90">Deep marshes with mysterious fog</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-white text-opacity-90 mb-4">Master the art of defense in misty swamplands where visibility is limited and enemies lurk in the shadows.</p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex space-x-2">
+                                <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-sm">Easy</span>
+                                <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-sm">Medium</span>
+                                <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-sm">Hard</span>
+                            </div>
+                            <span class="text-white"><i class="fas fa-diamond text-yellow-300 mr-1"></i> Rewards</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- World 3 -->
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg border border-white border-opacity-20 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                    <div class="h-32 bg-cover bg-center relative">
+                        <div class="absolute inset-0 bg-gradient-to-t from-dark/70 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-shadow">
+                            <h3 class="text-2xl font-bold text-white">Dry Deserts</h3>
+                            <p class="text-white text-opacity-90">Scorching sands and heat waves</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-white text-opacity-90 mb-4">Fight under the blazing sun where resources are scarce and enemies are toughened by the harsh desert environment.</p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex space-x-2">
+                                <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-sm">Easy</span>
+                                <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-sm">Medium</span>
+                                <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-sm">Hard</span>
+                            </div>
+                            <span class="text-white"><i class="fas fa-diamond text-yellow-300 mr-1"></i> Rewards</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- World 4 -->
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg border border-white border-opacity-20 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                    <div class="h-32 bg-cover bg-center relative">
+                        <div class="absolute inset-0 bg-gradient-to-t from-secondary/70 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-shadow">
+                            <h3 class="text-2xl font-bold text-white">Icy Mountains</h3>
+                            <p class="text-white text-opacity-90">Frozen peaks and snow storms</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-white text-opacity-90 mb-4">Defend on slippery terrain where ice and snow slow your enemies but also affect your tower building strategies.</p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex space-x-2">
+                                <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-sm">Easy</span>
+                                <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-sm">Medium</span>
+                                <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-sm">Hard</span>
+                            </div>
+                            <span class="text-white"><i class="fas fa-diamond text-yellow-300 mr-1"></i> Rewards</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- World 5 -->
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg border border-white border-opacity-20 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                    <div class="h-32 bg-cover bg-center relative">
+                        <div class="absolute inset-0 bg-gradient-to-t from-tertiary/70 to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 text-shadow">
+                            <h3 class="text-2xl font-bold text-white">Ancient Volcanoes</h3>
+                            <p class="text-white text-opacity-90">Molten lava and hot ash</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-white text-opacity-90 mb-4">Battle in the fiery landscape where eruptions create dynamic challenges and powerful enemies emerge from the fire.</p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex space-x-2">
+                                <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-sm">Easy</span>
+                                <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-sm">Medium</span>
+                                <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-sm">Hard</span>
+                            </div>
+                            <span class="text-white"><i class="fas fa-diamond text-yellow-300 mr-1"></i> Rewards</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bonus World -->
+                <div class="bg-primary bg-opacity-20 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg border border-white border-opacity-20 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl relative">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="text-center p-6">
+                            <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-lock text-3xl text-white"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-2">Mysterious Realm</h3>
+                            <p class="text-white text-opacity-90">Coming soon in future updates!</p>
+                            <a href="#download"> <button class="mt-4 px-6 py-2 bg-white bg-opacity-20 text-white rounded-full hover:bg-opacity-30 transition-all duration-300">
+                                    Stay Tuned
+                                </button></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Towers Section -->
+    <section id="towers" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-secondary mb-4">Powerful Defenses</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Build and upgrade a variety of powerful towers to repel the invading forces</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16">
+                <div class="order-2 md:order-1">
+                    <h3 class="text-3xl font-bold text-secondary mb-4">Master Different Tower Types</h3>
+                    <p class="text-xl text-gray-600 mb-6">Each tower has unique abilities, attack patterns, and strategic advantages.</p>
+
+                    <div class="space-y-6">
+                        <div class="flex items-start p-4 bg-gray-50 rounded-xl shadow-sm">
+                            <div class="flex-shrink-0 bg-primary p-3 rounded-full mr-4">
+                                <i class="fas fa-bow-arrow text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold text-secondary mb-1">Archer Tower</h4>
+                                <p class="text-gray-600">Long-range towers with piercing damage that can target multiple enemies in a line.</p>
+                                <div class="mt-2 flex items-center space-x-2">
+                                    <span class="text-xs bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded-full">Piercing</span>
+                                    <span class="text-xs bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded-full">Long Range</span>
+                                    <span class="text-xs bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded-full">Single Target</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start p-4 bg-gray-50 rounded-xl shadow-sm">
+                            <div class="flex-shrink-0 bg-tertiary p-3 rounded-full mr-4">
+                                <i class="fas fa-hat-wizard text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold text-secondary mb-1">Magic Tower</h4>
+                                <p class="text-gray-600">Enchanted towers that deal magical damage and can slow enemies or deal area damage.</p>
+                                <div class="mt-2 flex items-center space-x-2">
+                                    <span class="text-xs bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded-full">Magic Damage</span>
+                                    <span class="text-xs bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded-full">Slow Effect</span>
+                                    <span class="text-xs bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded-full">Area of Effect</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start p-4 bg-gray-50 rounded-xl shadow-sm">
+                            <div class="flex-shrink-0 bg-secondary p-3 rounded-full mr-4">
+                                <i class="fas fa-chess-knight text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold text-secondary mb-1">Barracks Tower</h4>
+                                <p class="text-gray-600">Deploys brave soldiers who engage enemies directly, blocking their path and slowing their advance.</p>
+                                <div class="mt-2 flex items-center space-x-2">
+                                    <span class="text-xs bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded-full">Melee Damage</span>
+                                    <span class="text-xs bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded-full">Path Blocking</span>
+                                    <span class="text-xs bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded-full">Multi-Target</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start p-4 bg-gray-50 rounded-xl shadow-sm">
+                            <div class="flex-shrink-0 bg-dark p-3 rounded-full mr-4">
+                                <i class="fas fa-bomb text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold text-secondary mb-1">Cannon Tower</h4>
+                                <p class="text-gray-600">Heavy artillery that deals massive splash damage to groups of enemies within the blast radius.</p>
+                                <div class="mt-2 flex items-center space-x-2">
+                                    <span class="text-xs bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded-full">Splash Damage</span>
+                                    <span class="text-xs bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded-full">High Damage</span>
+                                    <span class="text-xs bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded-full">Slow Firing</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-1 md:order-2 relative">
+                    <div class="bg-gray-100 rounded-3xl p-8 relative overflow-hidden">
+                        <img src="/src/img/tower.png" alt="Tower Types" class="w-full h-auto rounded-xl shadow-lg" />
+                        <div class="absolute top-4 right-4 animate-pulse-slow">
+                            <div class="bg-primary rounded-full h-16 w-16 flex items-center justify-center shadow-lg">
+                                <i class="fas fa-arrow-up text-xl text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-secondary to-primary rounded-3xl p-8 md:p-12 text-white">
+                <div class="text-center mb-10">
+                    <h3 class="text-3xl font-bold mb-4">Tower Upgrade System</h3>
+                    <p class="text-xl max-w-2xl mx-auto">Evolve your defenses to match the growing threat! Each tower can be upgraded multiple times.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="relative bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white border-opacity-20 h-full">
+                        <h4 class="text-xl font-bold mb-3">Level 1</h4>
+                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full mb-4 flex items-center justify-center">
+                            <i class="fas fa-chess-rook text-2xl"></i>
+                        </div>
+                        <p class="mb-3">Basic tower with standard damage and range.</p>
+                        <ul class="space-y-1 mb-6">
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-green-300"></i>
+                                <span>Standard attack speed</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-green-300"></i>
+                                <span>Basic damage</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-green-300"></i>
+                                <span>Normal range</span>
+                            </li>
+                        </ul>
+                        <span class="absolute bottom-4 right-4 opacity-60">
+                            <i class="fas fa-coins mr-1"></i> Low Cost
+                        </span>
+                    </div>
+
+                    <div class="relative bg-white bg-opacity-20 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white border-opacity-30 h-full">
+                        <h4 class="text-xl font-bold mb-3">Level 2</h4>
+                        <div class="w-16 h-16 bg-white bg-opacity-30 rounded-full mb-4 flex items-center justify-center">
+                            <i class="fas fa-chess-rook text-2xl"></i>
+                        </div>
+                        <p class="mb-3">Enhanced tower with improved stats and abilities.</p>
+                        <ul class="space-y-1 mb-6">
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-green-300"></i>
+                                <span>Faster attack speed</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-green-300"></i>
+                                <span>Increased damage</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-green-300"></i>
+                                <span>Extended range</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-green-300"></i>
+                                <span>Special ability unlocked</span>
+                            </li>
+                        </ul>
+                        <span class="absolute bottom-4 right-4 opacity-60">
+                            <i class="fas fa-coins mr-1"></i> Medium Cost
+                        </span>
+                    </div>
+
+                    <div class="relative bg-white bg-opacity-30 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white border-opacity-40 h-full">
+                        <h4 class="text-xl font-bold mb-3">Level 3</h4>
+                        <div class="w-16 h-16 bg-white bg-opacity-40 rounded-full mb-4 flex items-center justify-center">
+                            <i class="fas fa-chess-rook text-2xl"></i>
+                        </div>
+                        <p class="mb-3">Maximum power with devastating capabilities.</p>
+                        <ul class="space-y-1 mb-6">
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-green-300"></i>
+                                <span>Maximum attack speed</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-green-300"></i>
+                                <span>Massive damage boost</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-green-300"></i>
+                                <span>Maximum range</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-green-300"></i>
+                                <span>Advanced special ability</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-green-300"></i>
+                                <span>Secondary effect added</span>
+                            </li>
+                        </ul>
+                        <span class="absolute bottom-4 right-4 opacity-60">
+                            <i class="fas fa-coins mr-1"></i> High Cost
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="py-20 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-between bg-gradient-to-r from-secondary to-primary rounded-3xl p-8 md:p-12 overflow-hidden relative">
+                <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\" 60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-20"></div>
+
+                <div class="w-full md:w-7/12 mb-10 md:mb-0 relative z-10">
+                    <h2 class="text-4xl md:text-5xl font-bold text-white mb-4 text-shadow">Download Now</h2>
+                    <p class="text-xl text-white text-opacity-90 mb-6">Get ready to defend your kingdom against hordes of invaders! Download TowerGuard Champions today and start your strategic tower defense adventure.</p>
+
+                    <ul class="mb-8 space-y-3">
+                        <li class="flex items-center text-white">
+                            <i class="fas fa-check-circle text-green-300 mr-3 text-xl"></i>
+                            <span class="text-lg">Completely free to play</span>
+                        </li>
+                        <li class="flex items-center text-white">
+                            <i class="fas fa-check-circle text-green-300 mr-3 text-xl"></i>
+                            <span class="text-lg">No internet connection required</span>
+                        </li>
+                        <li class="flex items-center text-white">
+                            <i class="fas fa-check-circle text-green-300 mr-3 text-xl"></i>
+                            <span class="text-lg">Regular updates with new content</span>
+                        </li>
+                        <li class="flex items-center text-white">
+                            <i class="fas fa-check-circle text-green-300 mr-3 text-xl"></i>
+                            <span class="text-lg">Supports all Android devices</span>
+                        </li>
+                        <li class="flex items-center text-white">
+                            <i class="fas fa-check-circle text-green-300 mr-3 text-xl"></i>
+                            <span class="text-lg">Family friendly - suitable for ages 3+</span>
+                        </li>
+                    </ul>
+
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <a href="https://play.google.com/store/apps/details?id=com.daedalusgames.kingdomreborn&pcampaignid=web_share" target="_blank" class="px-8 py-4 bg-white text-primary rounded-full text-xl font-bold hover:bg-opacity-90 transition-all duration-300 shadow-lg flex items-center justify-center">
+                            <i class="fab fa-google-play mr-3 text-2xl"></i>
+                            Google Play
+                        </a>
+
+                    </div>
+
+                    <div class="mt-6 flex items-center">
+                        <div class="flex">
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <i class="fas fa-star-half-alt text-yellow-400"></i>
+                        </div>
+                        <div class="ml-2 text-white">
+                            <span class="font-bold">4.4</span> | <span>1,670 Reviews</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-5/12 relative z-10">
+                    <div class="relative w-full max-w-sm mx-auto">
+                        <div class="absolute inset-0 bg-dark rounded-3xl transform rotate-3 scale-105 opacity-20"></div>
+                        <div class="absolute inset-0 bg-tertiary rounded-3xl transform -rotate-3 scale-105 opacity-30"></div>
+                        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden relative border-4 border-white">
+                            <img src="/src/img/download.png" alt="Tower Defense Game Screenshot" class="w-full h-auto" />
+                            <div class="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-t from-primary/30 to-transparent"></div>
+                        </div>
+                        <div class="absolute -top-6 -right-6 animate-float">
+                            <div class="w-20 h-20 bg-primary rounded-full flex items-center justify-center shadow-xl">
+                                <i class="fas fa-download text-2xl text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-20 text-center">
+                <h3 class="text-3xl font-bold text-secondary mb-6">Ready for the Ultimate Tower Defense Challenge?</h3>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+                    Join millions of players worldwide who are already defending their kingdoms with strategy and skill. Are you up for the challenge?
+                </p>
+                <a href="#download" class="inline-block px-8 py-4 bg-primary text-white rounded-full text-xl font-bold hover:bg-tertiary transition-all duration-300 shadow-lg">
+                    <i class="fas fa-gamepad mr-3"></i>
+                    Start Your Defense Now
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Section -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-secondary mb-4">Join Our Community</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Connect with other tower defense strategists and share your best defensive tactics</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <!-- Testimonial 1 -->
+                <div class="bg-gray-50 rounded-2xl p-6 shadow-md border border-gray-100 relative">
+                    <div class="absolute -top-6 left-1/2 transform -translate-x-1/2">
+                        <div class="w-12 h-12 bg-tertiary rounded-full flex items-center justify-center shadow-md">
+                            <i class="fas fa-quote-left text-white"></i>
+                        </div>
+                    </div>
+                    <div class="pt-4">
+                        <p class="text-gray-600 mb-6 italic">"This is the best tower defense game I've played! The different maps and tower types make every level a unique challenge. Can't stop playing!"</p>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center mr-3">
+                                <span class="text-white font-bold">JD</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-secondary">John D.</div>
+                                <div class="text-sm text-gray-500">Hardcore Player</div>
+                            </div>
+                            <div class="ml-auto">
+                                <div class="flex">
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="bg-gray-50 rounded-2xl p-6 shadow-md border border-gray-100 relative">
+                    <div class="absolute -top-6 left-1/2 transform -translate-x-1/2">
+                        <div class="w-12 h-12 bg-tertiary rounded-full flex items-center justify-center shadow-md">
+                            <i class="fas fa-quote-left text-white"></i>
+                        </div>
+                    </div>
+                    <div class="pt-4">
+                        <p class="text-gray-600 mb-6 italic">"I love that I can play without internet! The graphics are beautiful and the tower upgrade system gives so many strategic options."</p>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center mr-3">
+                                <span class="text-white font-bold">SR</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-secondary">Sarah R.</div>
+                                <div class="text-sm text-gray-500">Casual Gamer</div>
+                            </div>
+                            <div class="ml-auto">
+                                <div class="flex">
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star-half-alt text-yellow-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="bg-gray-50 rounded-2xl p-6 shadow-md border border-gray-100 relative">
+                    <div class="absolute -top-6 left-1/2 transform -translate-x-1/2">
+                        <div class="w-12 h-12 bg-tertiary rounded-full flex items-center justify-center shadow-md">
+                            <i class="fas fa-quote-left text-white"></i>
+                        </div>
+                    </div>
+                    <div class="pt-4">
+                        <p class="text-gray-600 mb-6 italic">"My kids and I play this together. It's challenging but not impossible. The different difficulty modes are perfect for family game time!"</p>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-dark rounded-full flex items-center justify-center mr-3">
+                                <span class="text-white font-bold">MT</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-secondary">Michael T.</div>
+                                <div class="text-sm text-gray-500">Family Gamer</div>
+                            </div>
+                            <div class="ml-auto">
+                                <div class="flex">
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-16 text-center">
+                <h3 class="text-2xl font-bold text-secondary mb-8">Follow Us</h3>
+                <div class="flex justify-center space-x-6">
+                    <a href="https://www.facebook.com/daedalusteam" target="_blank" class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white hover:bg-tertiary transition-all duration-300">
+                        <i class="fab fa-facebook-f text-xl"></i>
+                    </a>
+                    <a href="https://x.com/gamesDaedalus" target="_blank" class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white hover:bg-tertiary transition-all duration-300">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                    <a href="https://www.instagram.com/daedalus_games" target="_blank" class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white hover:bg-tertiary transition-all duration-300">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-secondary text-white pt-12 pb-6">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-10">
+                <a href="/" class="flex items-center space-x-2 mb-8 md:mb-0">
+                    <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg">
+                        <i class="fas fa-chess-rook text-2xl text-white"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-white">TowerGuard<span class="text-primary">Champions</span></span>
+                </a>
+
+                <div class="flex flex-wrap justify-center space-x-6">
+                    <a href="#features" class="text-white hover:text-primary transition-colors duration-300 mb-4 md:mb-0">Features</a>
+                    <a href="#gameplay" class="text-white hover:text-primary transition-colors duration-300 mb-4 md:mb-0">Gameplay</a>
+                    <a href="#worlds" class="text-white hover:text-primary transition-colors duration-300 mb-4 md:mb-0">Worlds</a>
+                    <a href="#towers" class="text-white hover:text-primary transition-colors duration-300 mb-4 md:mb-0">Towers</a>
+                    <a href="#download" class="text-white hover:text-primary transition-colors duration-300 mb-4 md:mb-0">Download</a>
+                </div>
+            </div>
+
+            <hr class="border-white border-opacity-20 mb-8">
+
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-center md:text-left mb-6 md:mb-0">
+                    <p class="text-white text-opacity-80">&copy; 2025 TowerGuard Champions. All Rights Reserved.</p>
+                </div>
+
+                <div class="flex space-x-4">
+                    <a href="/Policy356/" class="text-white text-opacity-80 hover:text-primary transition-colors duration-300">Privacy Policy</a>
+                    <a href="/Service347/" class="text-white text-opacity-80 hover:text-primary transition-colors duration-300">Terms of Use</a>
+                    <a href="/Cookie992/" class="text-white text-opacity-80 hover:text-primary transition-colors duration-300">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#" id="back-to-top" class="fixed bottom-8 right-8 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white shadow-lg opacity-0 invisible transition-all duration-300">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+
+    <!-- Mobile Menu Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const backToTop = document.getElementById('back-to-top');
+
+            menuToggle.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+                if (menuToggle.innerHTML.includes('fa-bars')) {
+                    menuToggle.innerHTML = '<i class="fas fa-times"></i>';
+                } else {
+                    menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                }
+            });
+
+            // Navigation links (close mobile menu on click)
+            const navLinks = document.querySelectorAll('a[href^="#"]');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                    }
+                });
+            });
+
+            // Back to top button visibility
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTop.classList.remove('opacity-0', 'invisible');
+                    backToTop.classList.add('opacity-100', 'visible');
+                } else {
+                    backToTop.classList.remove('opacity-100', 'visible');
+                    backToTop.classList.add('opacity-0', 'invisible');
+                }
+            });
+
+            // Back to top functionality
+            backToTop.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
+            // Animation on scroll for elements
+            const animateOnScroll = function() {
+                const elements = document.querySelectorAll('.animate-on-scroll');
+                elements.forEach(element => {
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const screenPosition = window.innerHeight / 1.3;
+
+                    if (elementPosition < screenPosition) {
+                        element.classList.add('animate-fade-in');
+                    }
+                });
+            };
+
+            // Add the animate-on-scroll class to elements you want to animate
+            const sectionsToAnimate = document.querySelectorAll('section > div > div:first-child');
+            sectionsToAnimate.forEach(section => {
+                section.classList.add('animate-on-scroll');
+            });
+
+            window.addEventListener('scroll', animateOnScroll);
+            animateOnScroll(); // Initial check on page load
+        });
+    </script>
+
+   
+
+</body>
+
+</html>
+
+
+
+<?php
+$cookieConsentHtml = '
+<style>
+.cookie-consent {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 101;
+    background: #31465a; /* Secondary color from the tower defense palette */
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    transform: translateY(100%);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    border-top: 3px solid #b10207; /* Primary red color from the tower defense palette */
+}
+
+.cookie-container {
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.cookie-content {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.cookie-title {
+    font-size: 1.1rem;
+    color: #ffffff;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-right: 1.5rem;
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+.cookie-title i {
+    color: #b10207; /* Primary red color from the tower defense palette */
+    font-size: 1.25rem;
+}
+
+.cookie-text {
+    color: #e6e6e6;
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.5;
+    font-weight: 300; 
+}
+
+.cookie-link {
+    color: #ffffff; /* White text */
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.cookie-link::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: #b10207; /* Primary red color from the tower defense palette */
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.cookie-link:hover::after {
+    transform: scaleX(1);
+}
+
+.cookie-buttons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.cookie-button-reject,
+.cookie-button-accept {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 8px; 
+}
+
+.cookie-button-reject {
+    background: transparent;
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.cookie-button-reject:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.cookie-button-accept {
+    background: #b10207; /* Primary red color from the tower defense palette */
+    color: #ffffff;
+    border: 2px solid #b10207;
+}
+
+.cookie-button-accept:hover {
+    background: #5f010a; /* Tertiary dark red color from the tower defense palette */
+    border-color: #5f010a;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 992px) {
+    .cookie-container {
+        flex-direction: column;
+        padding: 1.25rem;
+    }
+
+    .cookie-content {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 1.25rem;
+        width: 100%;
+    }
+
+    .cookie-title {
+        margin-bottom: 0.75rem;
+    }
+
+    .cookie-buttons {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 576px) {
+    .cookie-buttons {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.75rem;
+    }
+    
+    .cookie-button-reject,
+    .cookie-button-accept {
+        width: 100%;
+        text-align: center;
+    }
+}
+</style>
+<div id="cookieConsent" class="cookie-consent">
+    <div class="cookie-container">
+        <div class="cookie-content">
+            <h3 class="cookie-title">
+                <i class="fas fa-cookie-bite"></i>
+                Cookie Policy
+            </h3>
+            <p class="cookie-text">
+                TowerGuard Champions uses cookies to enhance your gaming experience. By continuing to use our website, you agree to the use of cookies. For more information, you can read our
+                <a href="/Policy356/" class="cookie-link">Privacy Policy</a>,
+                <a href="/Service347/" class="cookie-link">Terms of Service</a>,
+                and
+                <a href="/Cookie992/" class="cookie-link">Cookie Policy</a>.
+            </p>
+        </div>
+        
+        <div class="cookie-buttons">
+            <button id="rejectCookies" class="cookie-button-reject">
+                Reject
+            </button>
+            <button id="acceptCookies" class="cookie-button-accept">
+                Accept
+            </button>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+   const cookieConsent = document.getElementById("cookieConsent");
+   const acceptBtn = document.getElementById("acceptCookies");
+   const rejectBtn = document.getElementById("rejectCookies");
+   
+   if (!getCookie("aprenderd_cookie_consent")) {
+       setTimeout(() => {
+           cookieConsent.style.transform = "translateX(0)";
+       }, 1000);
+   }
+
+   function getCookie(name) {
+       let matches = document.cookie.match(new RegExp(
+           "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1") + "=([^;]*)"
+       ));
+       return matches ? decodeURIComponent(matches[1]) : undefined;
+   }
+   
+   function setCookie(name, value, days) {
+       const date = new Date();
+       date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+       const expires = "; expires=" + date.toUTCString();
+       document.cookie = name + "=" + value + expires + "; path=/; SameSite=Strict; Secure";
+   }
+
+   function handleConsent(consent) {
+       setCookie("aprenderd_cookie_consent", consent, 365);
+       cookieConsent.style.transform = "translateX(120%)";
+       
+       setTimeout(() => {
+           cookieConsent.remove();
+       }, 500);
+   }
+
+   acceptBtn.addEventListener("click", () => handleConsent("accepted"));
+   rejectBtn.addEventListener("click", () => handleConsent("rejected"));
+});
+</script>
+';
+
+if (!isset($_COOKIE["aprenderd_cookie_consent"])) {
+    echo $cookieConsentHtml;
+}
+?>
